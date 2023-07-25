@@ -1,0 +1,39 @@
+version: "3"
+services:
+  webserver:
+    image: wordpress:latest
+    container_name: abcd.com_webserver
+    ports:
+      - "8081:80"
+    volumes:
+      - "./wordpress:/var/www/html"
+      - "./nginx-config:/etc/nginx/sites-available"
+      - "./nginx-config:/etc/nginx/sites-enabled"
+    networks:
+      - abcd.com_wp_network
+
+  php:
+    image: php:7.2-fpm
+    container_name: abcd.com_php
+    volumes:
+      - "./wordpress:/var/www/html"
+    networks:
+      - abcd.com_wp_network
+
+  db:
+    image: mysql:latest
+    container_name: abcd.com_db
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: abcd.com_wordpress
+      MYSQL_USER: abcd.com_wordpress
+      MYSQL_PASSWORD: abcd.com_password
+    volumes:
+      - "./db-data:/var/lib/mysql"
+    networks:
+      - abcd.com_wp_network
+
+networks:
+  abcd.com_wp_network:
+    driver: bridge
